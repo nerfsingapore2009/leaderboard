@@ -4,8 +4,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nerf Singapore Leaderboard</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 20px; }
-    h1 { text-align: center; margin-bottom: 10px; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+      animation: fadeInTitle 1s ease forwards;
+    }
     input[type="text"] {
       display: block;
       margin: 0 auto 20px;
@@ -15,6 +24,7 @@
       font-size: 16px;
       border: 1px solid #ccc;
       border-radius: 6px;
+      animation: pulseGlow 1s infinite alternate;
     }
     table {
       border-collapse: collapse;
@@ -22,6 +32,8 @@
       max-width: 600px;
       margin: auto;
       background-color: white;
+      opacity: 0;
+      transition: opacity 1s ease;
     }
     th, td {
       border: 1px solid #ddd;
@@ -35,6 +47,11 @@
     tr:nth-child(even) {
       background-color: #f9f9f9;
     }
+    tr:hover {
+      transform: scale(1.02);
+      transition: transform 0.2s ease;
+      background-color: #e0f7ff;
+    }
     .avatar {
       width: 30px;
       height: 30px;
@@ -42,18 +59,22 @@
       vertical-align: middle;
       margin-right: 8px;
     }
-    @media screen and (max-width: 600px) {
-      table, thead, tbody, th, td, tr {
-        display: block;
-        width: 100%;
-      }
-      th { text-align: center; }
-      td { padding: 8px; border: none; background-color: #fff; }
+    @keyframes fadeInTitle {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    @keyframes pulseGlow {
+      from { box-shadow: 0 0 5px #0077ff; }
+      to { box-shadow: 0 0 15px #0077ff; }
     }
   </style>
 </head>
 <body>
-  <h1>🎯 NERF Battle Leaderboard</h1>
+  <h1>🎯 Nerf Singapore Leaderboard</h1>
   <input type="text" id="searchBox" placeholder="🔍 Search attendee..." onkeyup="filterTable()" />
   <table id="leaderboard">
     <thead><tr><th>Name</th><th>Events Attended</th></tr></thead>
@@ -62,7 +83,12 @@
 
   <script src="https://cdn.jsdelivr.net/npm/tabletop@1.5.4/tabletop.js"></script>
   <script>
-    window.onload = function () {
+    document.addEventListener("DOMContentLoaded", () => {
+      const table = document.getElementById("leaderboard");
+      setTimeout(() => {
+        table.style.opacity = 1;
+      }, 300);
+
       Tabletop.init({
         key: 'https://docs.google.com/spreadsheets/d/1ALxrTCrICM91a8pPtWCzVCa7FFuRc8zXBwvIBk3NzOg/pubhtml',
         simpleSheet: true,
@@ -86,7 +112,7 @@
           });
         }
       });
-    };
+    });
 
     function filterTable() {
       const input = document.getElementById("searchBox").value.toLowerCase();
