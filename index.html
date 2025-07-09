@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <title>NERF SG Leaderboard</title>
   <meta charset="UTF-8" />
-  <title>Live Attendance Leaderboard</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding: 30px;
-      background-color: #f0f2f5;
+      padding: 40px;
+      background-color: #f7f9fc;
     }
     h1 {
       text-align: center;
       color: #333;
     }
     input {
-      margin-bottom: 10px;
+      margin-bottom: 15px;
       padding: 8px;
-      width: 200px;
+      width: 250px;
       font-size: 16px;
     }
     table {
@@ -40,9 +40,8 @@
   </style>
 </head>
 <body>
-  <h1>📋 Top 10 Attendance Leaderboard</h1>
+  <h1>🏆 NERF SG Live Leaderboard</h1>
   <input type="text" id="search" placeholder="Find your name..." />
-
   <table id="leaderboard">
     <thead>
       <tr>
@@ -54,38 +53,32 @@
     <tbody></tbody>
   </table>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <script>
-    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBCKa-Pcb5v8BIGHM3jV21q8-o0pTFFiLqUztB3YvwhKVm6Thgf4AvcHyaO0kVirRMrNRGLuZG9jE3/pub?output=csv';
+    const sheetId = '1ZDuKdgizR-QQxuuQTPPNSSt55mmLq-o1H7j5jqE5fKw';
+    const apiKey = 'AIzaSyCmZQDxTQUKAXMMLndNrDy9Zjmh1L0MyhA';
+    const range = 'Sheet1!A2:A';
 
-    fetch(csvUrl)
-      .then(response => response.text())
-      .then(csv => {
-        const data = Papa.parse(csv, { header: false }).data;
-        const cleaned = data.map(row => row[0]?.trim().toLowerCase()).filter(Boolean);
+    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`)
+      .then(res => res.json())
+      .then(data => {
+        const names = data.values.flat().map(n => n.trim().toLowerCase());
+        const counts = {};
+        names.forEach(name => counts[name] = (counts[name] || 0) + 1);
 
-        const countMap = {};
-        cleaned.forEach(name => {
-          countMap[name] = (countMap[name] || 0) + 1;
-        });
-
-        const sortedData = Object.entries(countMap)
+        const sorted = Object.entries(counts)
           .sort((a, b) => b[1] - a[1])
-          .map((entry, i) => {
-            return {
-              rank: i + 1,
-              name: entry[0].charAt(0).toUpperCase() + entry[0].slice(1),
-              count: entry[1]
-            };
-          });
+          .map(([name, count], i) => ({
+            rank: i + 1,
+            name: name.charAt(0).toUpperCase() + name.slice(1),
+            count
+          }));
 
         const tbody = document.querySelector('#leaderboard tbody');
-        sortedData.slice(0, 10).forEach(person => {
-          const row = `<tr><td>${person.rank}</td><td>${person.name}</td><td>${person.count}</td></tr>`;
+        sorted.slice(0, 10).forEach(entry => {
+          const row = `<tr><td>${entry.rank}</td><td>${entry.name}</td><td>${entry.count}</td></tr>`;
           tbody.innerHTML += row;
         });
 
-        // search highlight
         document.getElementById('search').addEventListener('input', function () {
           const keyword = this.value.toLowerCase();
           document.querySelectorAll('#leaderboard tbody tr').forEach(row => {
@@ -95,7 +88,6 @@
         });
       });
 
-    // sorting function
     function sortTable(colIndex) {
       const table = document.getElementById("leaderboard");
       const rows = Array.from(table.rows).slice(1);
