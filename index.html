@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nerf Singapore Leaderboard</title>
+  <title>NERF Battle Leaderboard</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -24,7 +24,7 @@
       font-size: 16px;
       border: 1px solid #ccc;
       border-radius: 6px;
-      animation: pulseGlow 1s infinite alternate;
+      animation: pulseGlow 1.5s infinite alternate;
     }
     table {
       border-collapse: collapse;
@@ -74,7 +74,7 @@
   </style>
 </head>
 <body>
-  <h1>🎯 Nerf Singapore Leaderboard</h1>
+  <h1>🎯 NERF Battle Leaderboard</h1>
   <input type="text" id="searchBox" placeholder="🔍 Search attendee..." onkeyup="filterTable()" />
   <table id="leaderboard">
     <thead><tr><th>Name</th><th>Events Attended</th></tr></thead>
@@ -98,10 +98,11 @@
 
           data.forEach((row, index) => {
             const tr = document.createElement("tr");
+
             let medal = "";
-            if (index === 0) medal = "🥇 ";
-            else if (index === 1) medal = "🥈 ";
-            else if (index === 2) medal = "🥉 ";
+            if (index === 0) medal = `<span style="animation:bounce 1s ease infinite;">🥇</span> `;
+            else if (index === 1) medal = `<span style="animation:bounce 1s ease infinite 0.2s;">🥈</span> `;
+            else if (index === 2) medal = `<span style="animation:bounce 1s ease infinite 0.4s;">🥉</span> `;
 
             const avatarHTML = row.AvatarURL
               ? `<img src="${row.AvatarURL}" class="avatar" alt="avatar" />`
