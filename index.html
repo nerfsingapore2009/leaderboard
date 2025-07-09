@@ -40,7 +40,7 @@
   </style>
 </head>
 <body>
-  <h1>🏆 NERF SG Live Leaderboard</h1>
+  <h1>🏆 NERF SG Full Attendance Leaderboard</h1>
   <input type="text" id="search" placeholder="Find your name..." />
   <table id="leaderboard">
     <thead>
@@ -74,7 +74,7 @@
           }));
 
         const tbody = document.querySelector('#leaderboard tbody');
-        sorted.slice(0, 10).forEach(entry => {
+        sorted.forEach(entry => {
           const row = `<tr><td>${entry.rank}</td><td>${entry.name}</td><td>${entry.count}</td></tr>`;
           tbody.innerHTML += row;
         });
