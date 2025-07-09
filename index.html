@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <script src="https://cdn.jsdelivr.net/npm/tabletop@1.5.4/tabletop.js"></script>
   <meta charset="UTF-8">
   <title>Nerf Singapore Leaderboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,7 +29,7 @@
     table {
       border-collapse: collapse;
       width: 100%;
-      max-width: 600px;
+      max-width: 700px;
       margin: auto;
       background-color: white;
       opacity: 0;
@@ -78,7 +77,13 @@
   <h1>🎯 Nerf Singapore Leaderboard</h1>
   <input type="text" id="searchBox" placeholder="🔍 Search attendee..." onkeyup="filterTable()" />
   <table id="leaderboard">
-    <thead><tr><th>Name</th><th>Events Attended</th></tr></thead>
+    <thead>
+      <tr>
+        <th>Rank</th>
+        <th>Name</th>
+        <th>Events Attended</th>
+      </tr>
+    </thead>
     <tbody></tbody>
   </table>
 
@@ -100,13 +105,19 @@
           const tbody = document.querySelector("#leaderboard tbody");
           rows.forEach((row, index) => {
             const tr = document.createElement("tr");
+
             let medal = "";
             if (index === 0) medal = `<span style="animation:bounce 1s ease infinite;">🥇</span> `;
             else if (index === 1) medal = `<span style="animation:bounce 1s ease infinite 0.2s;">🥈</span> `;
             else if (index === 2) medal = `<span style="animation:bounce 1s ease infinite 0.4s;">🥉</span> `;
 
             const avatarHTML = row[2] ? `<img src="${row[2]}" class="avatar" alt="avatar" />` : "";
-            tr.innerHTML = `<td>${medal}${avatarHTML}${row[0]}</td><td>${row[1]}</td>`;
+
+            tr.innerHTML = `
+              <td>${medal || index + 1}</td>
+              <td>${avatarHTML}${row[0]}</td>
+              <td>${row[1]}</td>
+            `;
             tbody.appendChild(tr);
           });
         });
@@ -116,7 +127,7 @@
       const input = document.getElementById("searchBox").value.toLowerCase();
       const rows = document.querySelectorAll("#leaderboard tbody tr");
       rows.forEach(row => {
-        const name = row.cells[0].textContent.toLowerCase();
+        const name = row.cells[1].textContent.toLowerCase();
         row.style.display = name.includes(input) ? "" : "none";
       });
     }
