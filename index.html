@@ -1,107 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>NERF SG Leaderboard</title>
-  <meta charset="UTF-8" />
+  <title>NERF Leaderboard</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 40px;
-      background-color: #f7f9fc;
-    }
-    h1 {
-      text-align: center;
-      color: #333;
-    }
-    input {
-      margin-bottom: 15px;
-      padding: 8px;
-      width: 250px;
-      font-size: 16px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-    }
-    th, td {
-      padding: 12px;
-      border-bottom: 1px solid #ccc;
-      text-align: left;
-    }
-    th {
-      background-color: #0078d4;
-      color: white;
-      cursor: pointer;
-    }
-    tr.highlight {
-      background-color: #ffff99;
-    }
+    body { font-family: Arial; background: #f4f4f4; }
+    table { border-collapse: collapse; width: 80%; margin: auto; }
+    th, td { border: 1px solid #ddd; padding: 8px; }
+    th { background-color: #333; color: white; }
+    tr:nth-child(even) { background-color: #eee; }
   </style>
 </head>
 <body>
-  <h1>🏆 NERF SG Full Attendance Leaderboard</h1>
-  <input type="text" id="search" placeholder="Find your name..." />
+  <h1 style="text-align:center">🎯 NERF Battle Leaderboard</h1>
   <table id="leaderboard">
-    <thead>
-      <tr>
-        <th onclick="sortTable(0)">Rank 🔽</th>
-        <th onclick="sortTable(1)">Name 🔽</th>
-        <th onclick="sortTable(2)">Attendance 🔽</th>
-      </tr>
-    </thead>
+    <thead><tr><th>Attendee</th><th>Events Attended</th></tr></thead>
     <tbody></tbody>
   </table>
 
+  <script src="https://cdn.jsdelivr.net/npm/tabletop@1.5.4/tabletop.js"></script>
   <script>
-    const sheetId = '1ZDuKdgizR-QQxuuQTPPNSSt55mmLq-o1H7j5jqE5fKw';
-    const apiKey = 'AIzaSyCmZQDxTQUKAXMMLndNrDy9Zjmh1L0MyhA';
-    const range = 'Sheet1!A2:A';
-
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`)
-      .then(res => res.json())
-      .then(data => {
-        const names = data.values.flat().map(n => n.trim().toLowerCase());
-        const counts = {};
-        names.forEach(name => counts[name] = (counts[name] || 0) + 1);
-
-        const sorted = Object.entries(counts)
-          .sort((a, b) => b[1] - a[1])
-          .map(([name, count], i) => ({
-            rank: i + 1,
-            name: name.charAt(0).toUpperCase() + name.slice(1),
-            count
-          }));
-
-        const tbody = document.querySelector('#leaderboard tbody');
-        sorted.forEach(entry => {
-          const row = `<tr><td>${entry.rank}</td><td>${entry.name}</td><td>${entry.count}</td></tr>`;
-          tbody.innerHTML += row;
-        });
-
-        document.getElementById('search').addEventListener('input', function () {
-          const keyword = this.value.toLowerCase();
-          document.querySelectorAll('#leaderboard tbody tr').forEach(row => {
-            const name = row.cells[1].textContent.toLowerCase();
-            row.classList.toggle('highlight', name.includes(keyword));
+    window.onload = function() {
+      Tabletop.init({
+        key: 'https://docs.google.com/spreadsheets/d/1ALxrTCrICM91a8pPtWCzVCa7FFuRc8zXBwvIBk3NzOg/pubhtml',
+        simpleSheet: true,
+        callback: function(data) {
+          const tbody = document.querySelector("#leaderboard tbody");
+          data.forEach(row => {
+            if(row.Name && row['Event Attended']) {
+              const tr = document.createElement("tr");
+              tr.innerHTML = `<td>${row.Name}</td><td>${row['Event Attended']}</td>`;
+              tbody.appendChild(tr);
+            }
           });
-        });
+        }
       });
-
-    function sortTable(colIndex) {
-      const table = document.getElementById("leaderboard");
-      const rows = Array.from(table.rows).slice(1);
-      const sorted = rows.sort((a, b) => {
-        const valA = a.cells[colIndex].innerText;
-        const valB = b.cells[colIndex].innerText;
-        return colIndex === 0 || colIndex === 2
-          ? parseInt(valA) - parseInt(valB)
-          : valA.localeCompare(valB);
-      });
-      sorted.reverse();
-      const tbody = table.querySelector("tbody");
-      tbody.innerHTML = "";
-      sorted.forEach(row => tbody.appendChild(row));
     }
   </script>
 </body>
