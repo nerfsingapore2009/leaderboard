@@ -126,31 +126,30 @@
   function sortTable(columnIndex) {
     if (!tbody) return;
 
-    const rows = Array.from(tbody.querySelectorAll("tr:not([style*='display: none'])")); // Only sort visible rows
-    
-    // Determine if the column contains numeric data by checking the first row's cell content
-    const firstCellText = rows.length > 0 ? rows[0].cells[columnIndex].innerText.trim() : '';
-    const isNumeric = !isNaN(parseFloat(firstCellText)) && isFinite(firstCellText);
+  const rows = Array.from(tbody.querySelectorAll("tr:not([style*='display: none'])"));
+  
+  // Determine if the column should be sorted as numeric
+  // Rank (0) and Score (2) are numeric, Player (1) is always text.
+  const isNumeric = (columnIndex === 0 || columnIndex === 2); // Explicitly define numeric columns
+  // No need for firstCellText check anymore for type determination
 
+  rows.sort((a, b) => {
+    let valA = a.cells[columnIndex].innerText.trim();
+    let valB = b.cells[columnIndex].innerText.trim();
 
-    rows.sort((a, b) => {
-      let valA = a.cells[columnIndex].innerText.trim();
-      let valB = b.cells[columnIndex].innerText.trim();
+    if (isNumeric) {
+      valA = parseFloat(valA);
+      valB = parseFloat(valB);
+    } else { // This else block will now always be hit for the Player column (columnIndex 1)
+      valA = valA.toLowerCase();
+      valB = valB.toLowerCase();
+    }
 
-      if (isNumeric) {
-        valA = parseFloat(valA);
-        valB = parseFloat(valB);
-      } else {
-        valA = valA.toLowerCase();
-        valB = valB.toLowerCase();
-      }
-
-      // Apply sorting based on current direction
-      if (sortDirections[columnIndex]) { // Current direction is ascending, so sort ascending
-        return valA > valB ? 1 : valA < valB ? -1 : 0;
-      } else { // Current direction is descending, so sort descending
-        return valA < valB ? 1 : valA > valB ? -1 : 0;
-      }
+    if (sortDirections[columnIndex]) { 
+      return valA > valB ? 1 : valA < valB ? -1 : 0;
+    } else { 
+      return valA < valB ? 1 : valA > valB ? -1 : 0;
+    }
     });
 
     // Toggle sort direction for the next click on this column
